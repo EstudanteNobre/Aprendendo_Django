@@ -1,0 +1,35 @@
+{% extends 'tarefas/base.html' %}
+
+    {% block titulo %} Home - Tarefas{% endblock %}
+
+    {% block corpo %}
+    <h1>Pagina Oficial das Tarefas</h1>
+    {% if tarefas %}
+
+        {% for tarefa in tarefas %}
+        <div>
+            <h3>
+               <a href="{% url 'individual' tarefa.id %}"> {{ tarefa.titulo }} </a> - 
+                {% if tarefa.concluida %}
+                    Concluida
+                {% else %}
+                    Não Concluida
+                {% endif %}
+            </h3>
+        </div>
+
+        <div> Autor: {{tarefa.usuario.username}} </div>
+        <div> Bio: {{tarefa.usuario.perfil.bio}} </div>
+
+        {% for etiqueta in tarefa.etiquetas_lista %}
+        <div style="display: inline-block; background-color: {{etiqueta.cor}};">Etiqueta: {{etiqueta.nome}}</div>
+        {% endfor %}
+            <hr />
+        {% endfor %}
+
+    {% else %}
+        <p>Não Existe Tarefas Cadastradas...</p>
+    {% endif %}
+
+
+    {% endblock %}

@@ -1,20 +1,57 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import TarefaForm
+from .models import Tarefa
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import Group
+from django.contrib.auth import login
 
 # Create your views here.
+@login_required
 def home(request):
-    frase = "Hello World"
-    return HttpResponse(frase)
+    lista = Tarefa.objects.select_related('usuario', 'usuario__perfil').prefetch_related('etiquetas').all()
 
+    if request.user.has_perm("tarefas.can_view_tarefas"):
+        lista = lista.all()
+
+    else:
+        lista = lista.filter(usuario=request.user)
+
+    for tarefa in lista:
+        tarefa.etiquetas_lista = list(tarefa.etiquetas.all())
+    return render(request, 'tarefas/home.html', {'tarefas' : lista})
+
+@permission_required("tarefas.add_tarefa")
 def add(request):
-    return HttpResponse("Adicionando uma nova tarefa ao sistema...")
+    if request.method == 'POST':
+        form = TarefaForm(request.POST)
+        if form.is_valid():
+            tarefa = form.save(commit=False)
+            tarefa.usuario = request.user
+            form.save()
+            form.save_m2m()
+            return redirect('home')
+        
+    form = TarefaForm()
+    return render(request, 'tarefas/adicionar.html', {'form' : form})
 
-def remove(request):
-    return HttpResponse("Removendo tarefas")
+def tarefa(request, id):
+    tarefa = get_object_or_404(Tarefa, pk=id)
+    return render(request, 'tarefas/tarefa.html', {'tarefa' : tarefa})
 
-def edit(request):
-    return HttpResponse("Editando tarefa")
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
 
-def search(request):
-    return HttpResponse("Buscando tarefas")
-    
+            group = Group.objects.get(name="usuarios_normais")
+            user.groups.add(group)
+
+            login(request, user)
+            return redirect('home')
+
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'registration/register.html', {'form' : form})

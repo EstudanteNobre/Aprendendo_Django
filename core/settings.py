@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-momswriggb24kfwrrora(vm*60967fv8o1ed!b$9fat#q0*#a#'
+SECRET_KEY = 'django-insecure-qui)m+n#yxq(w7wfxi!n!i$f18(94&a&keu6&crp=vi63e)59)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tarefas',
+
 ]
 
 MIDDLEWARE = [
@@ -99,6 +100,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_URL = '/tarefas/login'
+LOGIN_REDIRECT_URL = '/tarefas'
+LOGOUT_REDIRECT_URL = '/tarefas'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
